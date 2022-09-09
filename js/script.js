@@ -8,7 +8,7 @@ const messages = document.querySelector(".message");
 const playAgainButton = document.querySelector(".play-again");
 
 let word = "magnolia";
-const guessedLetters = [];
+let guessedLetters = [];
 let remainingGuesses = 8;
 
 const getWord = async function () {
@@ -25,13 +25,12 @@ getWord ();
 const placeholder = function (word) {
     const placeholderLetters = [];
     for (const letter of word) {
-        console.log(letter);
+        // console.log(letter);
         placeholderLetters.push("●");
     }
     wordInProgress.innerText = placeholderLetters.join("");
 };
 
-placeholder(word);
 
 guessLetterButton.addEventListener("click", function (e) {
     e.preventDefault();
@@ -65,6 +64,7 @@ const makeGuess = function (guess) {
     } else { 
         guessedLetters.push(guess);
         console.log(guessedLetters);
+        updateGuessesRemaining(guess);
         showGuessedLetters();
         updateWordInProgress(guessedLetters);
     }
@@ -79,7 +79,7 @@ const showGuessedLetters = function () {
     }
 };
 
-const updateWordInProgress = function(guessedLetters) {
+const updateWordInProgress = function (guessedLetters) {
     const wordUpper = word.toUpperCase();
     const wordArray = wordUpper.split("");
     const revealWord = [];
@@ -105,10 +105,11 @@ const updateGuessesRemaining = function (guess) {
 
     if (remainingGuesses === 0) {
         messages.innerHTML = `Game over! The word was <span class="highlight">${word}</span>.`;
+        startOver();
     } else if (remainingGuesses === 1) {
         remainingGuessesSpan.innerText = `${remainingGuesses} guess`;
     } else {
-        remainingGuesses.innerText = `${remainingGuesses} guesses`;
+        remainingGuessesSpan.innerText = `${remainingGuesses} guesses`;
     }
     };
 
@@ -116,5 +117,30 @@ const checkIfWin = function () {
     if (word.toUpperCase() === wordInProgress.innerText) {
         messages.classList.add("win");
         messages.innerHTML = `<p class="highlight">You guessed the correct word! Congrats!</p>`;
+
+        startOver();
     }
 };
+
+const startOver = function () {
+    guessLetterButton.classList.add("hide");
+    remainingGuessesParagraph.classList.add("hide");
+    guessedLettersElement.classList.remove("hide");
+    playAgainButton.classList.remove("hide");
+};
+
+playAgainButton.addEventListener("click", function () {
+    messages.classList.remove("win");
+    guessedLetters = [];
+    remainingGuesses = 8;
+    remainingGuessesSpan.innerText = `${remainingGuesses} guesses`;
+    guessedLettersElement.innerHTML = "";
+    messages.innerText = "";
+
+    getWord();
+
+    guessLetterButton.classList.remove("hide");
+    playAgainButton.classList.add("hide");
+    remainingGuessesParagraph.classList.remove("hide");
+    guessedLettersElement.classList.remove("hide");
+});
